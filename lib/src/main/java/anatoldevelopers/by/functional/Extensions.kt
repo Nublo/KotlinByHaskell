@@ -25,22 +25,22 @@ fun sum(xs: List<Int>): Int {
 fun sum2(xs: List<Int>) = reduce(0, xs) { acum, current -> acum + current }
 
 fun <T, R> List<T>.map(f: (T) -> R): List<R> = when (this.size) {
-    0 -> mutableListOf()
+    0 -> listOf()
     else -> f(head) + tail.map(f)
 }
 
-fun <T, R> List<T>.map2(f: (T) -> R): List<R> = reduce(mutableListOf(), this)
-{ xs, s -> (xs + f(s)).toMutableList() }
+fun <T, R> List<T>.map2(f: (T) -> R): List<R> = reduce(listOf(), this)
+{ xs, s -> xs + f(s) }
 
 fun <T> List<T>.filter(f: (T) -> Boolean): List<T> = when (this.size) {
-    0 -> mutableListOf()
+    0 -> listOf()
     else -> if (f(head)) head + tail.filter(f) else tail.filter(f)
 }
 
-fun <T> List<T>.filter2(f: (T) -> Boolean): List<T> = reduce(mutableListOf(), this)
+fun <T> List<T>.filter2(f: (T) -> Boolean): List<T> = reduce(listOf(), this)
 { ys, s ->
     if (f(s))
-        return@reduce (ys + s).toMutableList()
+        return@reduce ys + s
     else
         ys
 }
@@ -57,20 +57,20 @@ operator fun <T> List<T>.plus(xs: List<T>): List<T> = when (xs.size) {
     else -> (this + xs.head) + xs.tail
 }
 
-operator fun <T> T.plus(xs: List<T>): List<T> = mutableListOf(this) + xs
+operator fun <T> T.plus(xs: List<T>): List<T> = listOf(this) + xs
 
 fun <T, R> zip(xs: List<T>, ys: List<R>): List<Pair<T, R>> = when (xs.isEmpty() || ys.isEmpty()) {
-    true -> mutableListOf()
+    true -> listOf()
     false -> Pair(xs.head, ys.head) + zip(xs.tail, ys.tail)
 }
 
 fun <T, R, C> zipWith(xs: List<T>, ys: List<R>, f: (T, R) -> C): List<C> =
         zip(xs, ys).map { f(it.first, it.second) }
 
-fun maxSum(xs: List<Int>) = zipWith(xs, xs.tail, { a, b -> a + b }).max()
+fun maxSum(xs: List<Int>) = zipWith(xs, xs.tail) { a, b -> a + b }.max()
 
-fun <T> reverse(xs: List<T>) = reduce(mutableListOf<T>(), xs)
-{ ys, s -> (s + ys).toMutableList() }
+fun <T> reverse(xs: List<T>) = reduce(listOf<T>(), xs)
+{ ys, s -> s + ys }
 
 fun sumWithEvenIndexes(xs: List<Int>) =
         zip(xs, generateSequence(0) { it + 1 }.take(xs.size).toList())
@@ -78,4 +78,4 @@ fun sumWithEvenIndexes(xs: List<Int>) =
                 .map { it.first }
                 .sum
 
-fun <T> reduceSame(xs: List<T>) = reduce(mutableListOf<T>(), xs) { list, elem -> (list + elem).toMutableList() }
+fun <T> reduceSame(xs: List<T>) = reduce(listOf<T>(), xs) { list, elem -> list + elem }
